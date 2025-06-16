@@ -62,6 +62,7 @@ function App() {
     const animate = () => {
       cube.rotation.x += 0.01;
       cube.rotation.y += 0.01;
+      controls.update(); // 更新控制器
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
