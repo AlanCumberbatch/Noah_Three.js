@@ -1,0 +1,41 @@
+.control-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 8px;
+  color: white;
+  z-index: 1000;
+}
+
+.control-item {
+  margin-bottom: 15px;
+}
+
+.control-item:last-child {
+  margin-bottom: 0;
+}
+
+.control-item label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.control-item input[type="color"] {
+  width: 100%;
+  height: 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.control-item input[type="range"] {
+  width: 100%;
+  margin-right: 10px;
+}
+
+.control-item span {
+  font-size: 12px;
+  color: #ccc;
+}

@@ -1,88 +1,83 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import './App.css'
 
 function App() {
-  const mountRef = useRef<HTMLDivElement>(null)
-  const sceneRef = useRef<THREE.Scene | null>(null)
+  // 使用泛型为 ref 添加类型
+  const threeContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!mountRef.current || sceneRef.current) return
+
+    // 获取父容器宽高
+    const container = threeContainerRef.current;
+    const w = container?.clientWidth || window.innerWidth;
+    const h = container?.clientHeight || window.innerHeight;
 
     // 创建场景
-    const scene = new THREE.Scene()
-    sceneRef.current = scene
-
-    // 创建相机
+    const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      w / h,
       0.1,
       1000
-    )
-    camera.position.z = 5
+    );
+    camera.position.z = 5;
 
     // 创建渲染器
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    renderer.setClearColor(0x000000, 1) // 设置黑色背景
-    mountRef.current.appendChild(renderer.domElement)
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(w, h);
+    if (threeContainerRef.current) {
+      threeContainerRef.current.appendChild(renderer.domElement);
+    }
 
-    // 创建三角形
-    const geometry = new THREE.BufferGeometry()
-    const vertices = new Float32Array([
-      0.0, 1.0, 0.0,   // 顶点1
-      -1.0, -1.0, 0.0, // 顶点2
-      1.0, -1.0, 0.0   // 顶点3
-    ])
-    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+    // 添加 OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; // 启用阻尼效果（惯性）
+    controls.dampingFactor = 0.25; // 阻尼系数
+    controls.enableZoom = true; // 允许缩放
+    controls.minDistance = 2; // 缩放的最近距离
+    controls.maxDistance = 10; // 缩放的最远距离
 
-    // 创建材质
-    const material = new THREE.MeshBasicMaterial({
+    // 创建立方体
+    const geometry = new THREE.BoxGeometry();
+    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const material = new THREE.MeshPhongMaterial({
       color: 0x00ff00,
-      side: THREE.FrontSide
+      shininess: 100,
+      side: THREE.DoubleSide
     })
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
-    // 创建网格
-    const triangle = new THREE.Mesh(geometry, material)
-    scene.add(triangle)
+    // 添加光源
+    const ambientLight = new THREE.AmbientLight(0x404040, 1)
+    scene.add(ambientLight)
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+    directionalLight.position.set(5, 5, 5)
+    scene.add(directionalLight)
 
     // 动画循环
     const animate = () => {
-      requestAnimationFrame(animate)
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+    animate();
 
-      // 清除之前的渲染
-      renderer.clear()
-
-      // 更新三角形旋转
-      triangle.rotation.x += 0.01
-      triangle.rotation.y += 0.01
-
-      // 渲染场景
-      renderer.render(scene, camera)
-    }
-    animate()
-
-    // 处理窗口大小变化
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight
-      camera.updateProjectionMatrix()
-      renderer.setSize(window.innerWidth, window.innerHeight)
-    }
-    window.addEventListener('resize', handleResize)
-
-    // 清理函数
+    // 清理资源
     return () => {
-      window.removeEventListener('resize', handleResize)
-      mountRef.current?.removeChild(renderer.domElement)
-      geometry.dispose()
-      material.dispose()
-      renderer.dispose()
-    }
-  }, [])
+      renderer.dispose();
+      if (threeContainerRef.current) {
+        threeContainerRef.current.removeChild(renderer.domElement);
+      }
+    };
+  }, []);
 
   return (
-    <div ref={mountRef} style={{ width: '100vw', height: '100vh' }} />
+    <div ref={threeContainerRef} style={{ width: '100vw', height: '100vh' }} />
   )
 }
 

@@ -1,0 +1,38 @@
+.control-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 8px;
+  color: white;
+  z-index: 1000;
+}
+
+.control-item {
+  margin-bottom: 15px;
+}
+
+.control-item label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.control-item input[type="range"] {
+  width: 200px;
+  margin-right: 10px;
+}
+
+.control-item input[type="color"] {
+  width: 50px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+}
+
+.control-item span {
+  display: inline-block;
+  min-width: 40px;
+  text-align: right;
+}
